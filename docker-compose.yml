@@ -1,0 +1,22 @@
+services:
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: cloudflared
+    restart: unless-stopped
+    command: tunnel --no-autoupdate run
+    environment:
+      TUNNEL_TOKEN: ${TUNNEL_TOKEN}
+    networks:
+      - npm_network
+    healthcheck:
+      test: ["CMD", "cloudflared", "version"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+networks:
+  npm_network:
+    external: true
+    # Set this to the existing Docker network used by Nginx Proxy Manager.
+    name: ${NPM_DOCKER_NETWORK:-npm_network}
